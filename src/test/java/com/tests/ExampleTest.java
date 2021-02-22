@@ -3,19 +3,17 @@ package com.tests;
 import com.tests.utils.BaseExcel;
 import com.tests.utils.Wait;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.omg.CORBA.PUBLIC_MEMBER;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
-import java.security.PublicKey;
 import java.util.HashMap;
 
 import static com.tests.utils.Wait.waitAndClick;
@@ -30,6 +28,8 @@ public class ExampleTest {
     static Wait wait = new Wait();
     public String filepath = "TestDataTemplate.xlsx";
     public BaseExcel excel = new BaseExcel();
+    public String[][] requestData;
+
 
     @Test
     public void Test() throws Exception {
@@ -41,12 +41,13 @@ public class ExampleTest {
         HashMap<String, Object> chromeLocalStatePref = new HashMap<>();
         chromeLocalStatePref.put("download.default_directory", downloadFolderPath);
 
-        driver = new ChromeDriver(chromeOptions);
-        webDriverWait = new WebDriverWait(driver, waitTime);
 
         chromeOptions.addArguments("headless");
         chromeOptions.addArguments("window-size=1280x1024");
         chromeOptions.addArguments("--no-sandbox");
+
+        driver = new ChromeDriver(chromeOptions);
+        webDriverWait = new WebDriverWait(driver, waitTime);
 
         driver.manage().window().maximize();
         driver.get("https://cloud4.curemd.com/");
@@ -71,16 +72,48 @@ public class ExampleTest {
         wait.waitUntilIsPresent(webDriverWait, By.id("divCureMDPatientMenu"));
         driver.switchTo().frame("fraCureMD_Patient_Menu");
         driver.switchTo().frame("iFrameList");
+        waitAndClick(webDriverWait, driver, By.xpath("//*[contains(@onclick,'validateSearchClicked')]"));
+        int i = 1;
 
-        for (int i = 0; i < driver.findElements(By.xpath("//*[@id='patientList']//*/span[2]")).size(); i++) {
+        for (int j = 0; j < 1; j++) {
+            Thread.sleep(1000);
+            String names;
+            Actions actions = new Actions(driver);
             for (WebElement element : driver.findElements(By.xpath("//*[@id='patientList']//*/span[2]"))) {
                 System.out.println(element.getText());
-
+                actions.moveToElement(element).click().build().perform();
+                driver.switchTo().defaultContent();
+                driver.switchTo().frame("fraCureMD_Body");
+                Thread.sleep(800);
+                try {
+                    names = wait.waitAndGetText(webDriverWait, driver, By.cssSelector(".patientDetails"));
+                } catch (StaleElementReferenceException | ElementClickInterceptedException e) {
+                    names = wait.waitAndGetText(webDriverWait, driver, By.cssSelector(".patientDetails"));
+                }
+                driver.switchTo().defaultContent();
+                String[] namesList = names.split(",");
+                System.out.println(names);
+                driver.switchTo().frame("fraCureMD_Patient_Menu");
+                driver.switchTo().frame("iFrameList");
                 excel.writeExcel(filepath, 0, 0, i, element.getText());
-            }
-        }
+                excel.writeExcel(filepath, 0, 1, i, namesList[2].split(":")[1]);
+                excel.writeExcel(filepath, 0, 2, i, namesList[0]);
+                excel.writeExcel(filepath, 0, 3, i, namesList[1]);
+                i++;
 
+            }
+            webDriverWait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.cssSelector(".paginate_button.next"))));
+            waitAndClick(webDriverWait, driver, By.cssSelector(".paginate_button.next"));
+            j++;
+        }
         driver.switchTo().defaultContent();
+
+        driver.switchTo().frame("fraCureMD_Menu");
+        waitAndClick(webDriverWait, driver, By.id("patientBtn"));
+        waitAndClick(webDriverWait, driver, By.className("ButtonItemHover"));
+        requestData = BaseExcel.readExcel(filepath, 0);
+        waitAndSendKeys(webDriverWait, driver, By.className("//*[@name='BaseIntelliSenseControl1$txtField']"),
+               requestData[1][1] );
         System.out.println("Success");
 
     }

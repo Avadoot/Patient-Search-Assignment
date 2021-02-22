@@ -23,7 +23,15 @@ public class Wait {
         }
         driver.findElement(by).click();
     }
-
+    public static void waitAndClickElement(WebDriverWait webDriverWait, WebElement element) {
+        webDriverWait.until(ExpectedConditions.elementToBeClickable(element));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        element.click();
+    }
     public void moveToNewFrame(WebDriver driver) {
         for (String winHandle : driver.getWindowHandles()) {
             driver.switchTo().window(winHandle);
@@ -47,5 +55,11 @@ public class Wait {
 
     public void safeJavaScriptClick(WebElement element, WebDriver driver) throws Exception {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+    }
+
+    public String waitAndGetText(WebDriverWait webDriverWait, WebDriver driver, By by) {
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
+        String text = driver.findElement(by).getText();
+        return text;
     }
 }
