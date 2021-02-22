@@ -42,7 +42,6 @@ public class BaseExcel {
                     j++;
                 }
                 i++;
-                System.out.println();
             }
         } catch (IOException e) {
             e.printStackTrace();

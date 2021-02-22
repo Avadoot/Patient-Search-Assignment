@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -30,17 +31,18 @@ public class ExampleTest {
     public BaseExcel excel = new BaseExcel();
     public String[][] requestData;
 
-
-    @Test
-    public void Test() throws Exception {
+    @BeforeTest
+    public  void BeforeTest(){
         WebDriverManager.chromedriver().version("87").setup();
 
         System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
-        chromeOptions.addArguments("window-size=1280x1024");
 
         HashMap<String, Object> chromeLocalStatePref = new HashMap<>();
         chromeLocalStatePref.put("download.default_directory", downloadFolderPath);
+        chromeLocalStatePref.put("download.prompt_for_download", false);
 
+        chromeOptions.setExperimentalOption("localState", chromeLocalStatePref);
+        chromeOptions.setExperimentalOption("prefs", chromeLocalStatePref);
 
         chromeOptions.addArguments("headless");
         chromeOptions.addArguments("window-size=1280x1024");
@@ -53,6 +55,11 @@ public class ExampleTest {
         driver.get("https://cloud4.curemd.com/");
         String expectedPageTitle = "Welcome to CureMD";
         Assert.assertTrue(driver.getTitle().contains(expectedPageTitle), "Test Failed");
+
+    }
+
+    @Test
+    public void Test() throws Exception {
 
         waitAndSendKeys(webDriverWait, driver, By.id("vchLogin_Name"), "Absharma");
         waitAndSendKeys(webDriverWait, driver, By.id("vchPassword"), "Sharmaabb");
@@ -110,10 +117,31 @@ public class ExampleTest {
 
         driver.switchTo().frame("fraCureMD_Menu");
         waitAndClick(webDriverWait, driver, By.id("patientBtn"));
-        waitAndClick(webDriverWait, driver, By.className("ButtonItemHover"));
+        driver.switchTo().defaultContent();
+        driver.switchTo().frame("fraCureMD_Body");
+        waitAndClick(webDriverWait, driver, By.xpath("//*[@title='Search Patient']"));
         requestData = BaseExcel.readExcel(filepath, 0);
-        waitAndSendKeys(webDriverWait, driver, By.className("//*[@name='BaseIntelliSenseControl1$txtField']"),
-               requestData[1][1] );
+        waitAndSendKeys(webDriverWait, driver, By.xpath("//*[@name='BaseIntelliSenseControl1$txtField']"),
+               requestData[6][0] );
+        driver.findElement(By.xpath("//*[@name='BaseIntelliSenseControl1$txtField']")).sendKeys(Keys.ENTER);
+        Thread.sleep(1000);
+        waitAndClick(webDriverWait,driver,By.xpath("//*[contains(@id,'anchorPatientName')]"));
+        driver.switchTo().defaultContent();
+        driver.switchTo().frame("fraCureMD_Patient_Menu");
+        waitAndClick(webDriverWait,driver,By.id("webfx-tree-object-43-anchor"));
+        driver.switchTo().defaultContent();
+        driver.switchTo().frame("fraCureMD_Body");
+        driver.switchTo().frame("CustomFolders");
+        waitAndClick(webDriverWait,driver,By.xpath("//*[text()='1Old Records (0)']"));
+
+        driver.switchTo().defaultContent();
+        driver.switchTo().frame("fraCureMD_Body");
+        driver.switchTo().frame("Thumbs");
+        waitAndClick(webDriverWait,driver,By.xpath("//*[text()='All Documents']"));
+        waitAndClick(webDriverWait,driver,By.xpath("//*[@id='chkAll']"));
+        waitAndClick(webDriverWait,driver,By.xpath("//*[@id='downloadBtn']/a"));
+        wait.moveToNewFrame(driver);
+        Thread.sleep(7000);
         System.out.println("Success");
 
     }
