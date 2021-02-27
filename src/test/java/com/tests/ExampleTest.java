@@ -117,7 +117,6 @@ public class ExampleTest {
 
 
         for (int k = 1; k < requestData.length; k++) {
-            System.out.println(requestData.length);
             driver.switchTo().defaultContent();
 
             driver.switchTo().frame("fraCureMD_Menu");
@@ -147,8 +146,9 @@ public class ExampleTest {
                 waitAndClick(webDriverWait, driver, By.xpath("//*[@id='chkAll']"));
                 waitAndClick(webDriverWait, driver, By.xpath("//*[@id='downloadBtn']/a"));
                 Thread.sleep(7000);
-                System.out.println("Success");
-            }
+                System.out.println("Record found for " + requestData[k][0] + " and downloaded successfully");
+            } else
+                System.out.println("No document found for " + requestData[k][0]);
         }
     }
 
