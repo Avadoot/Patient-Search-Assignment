@@ -23,6 +23,7 @@ public class Wait {
         }
         driver.findElement(by).click();
     }
+
     public static void waitAndClickElement(WebDriverWait webDriverWait, WebElement element) {
         webDriverWait.until(ExpectedConditions.elementToBeClickable(element));
         try {
@@ -32,6 +33,7 @@ public class Wait {
         }
         element.click();
     }
+
     public void moveToNewFrame(WebDriver driver) {
         for (String winHandle : driver.getWindowHandles()) {
             driver.switchTo().window(winHandle);
