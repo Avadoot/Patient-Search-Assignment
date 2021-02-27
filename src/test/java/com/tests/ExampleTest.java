@@ -32,7 +32,7 @@ public class ExampleTest {
     public String[][] requestData;
 
     @BeforeTest
-    public  void BeforeTest(){
+    public void BeforeTest() {
         WebDriverManager.chromedriver().version("87").setup();
 
         System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
@@ -113,37 +113,43 @@ public class ExampleTest {
             waitAndClick(webDriverWait, driver, By.cssSelector(".paginate_button.next"));
             j++;
         }
-        driver.switchTo().defaultContent();
-
-        driver.switchTo().frame("fraCureMD_Menu");
-        waitAndClick(webDriverWait, driver, By.id("patientBtn"));
-        driver.switchTo().defaultContent();
-        driver.switchTo().frame("fraCureMD_Body");
-        waitAndClick(webDriverWait, driver, By.xpath("//*[@title='Search Patient']"));
         requestData = BaseExcel.readExcel(filepath, 0);
-        waitAndSendKeys(webDriverWait, driver, By.xpath("//*[@name='BaseIntelliSenseControl1$txtField']"),
-               requestData[6][0] );
-        driver.findElement(By.xpath("//*[@name='BaseIntelliSenseControl1$txtField']")).sendKeys(Keys.ENTER);
-        Thread.sleep(1000);
-        waitAndClick(webDriverWait,driver,By.xpath("//*[contains(@id,'anchorPatientName')]"));
-        driver.switchTo().defaultContent();
-        driver.switchTo().frame("fraCureMD_Patient_Menu");
-        waitAndClick(webDriverWait,driver,By.id("webfx-tree-object-43-anchor"));
-        driver.switchTo().defaultContent();
-        driver.switchTo().frame("fraCureMD_Body");
-        driver.switchTo().frame("CustomFolders");
-        waitAndClick(webDriverWait,driver,By.xpath("//*[text()='1Old Records (0)']"));
 
-        driver.switchTo().defaultContent();
-        driver.switchTo().frame("fraCureMD_Body");
-        driver.switchTo().frame("Thumbs");
-        waitAndClick(webDriverWait,driver,By.xpath("//*[text()='All Documents']"));
-        waitAndClick(webDriverWait,driver,By.xpath("//*[@id='chkAll']"));
-        waitAndClick(webDriverWait,driver,By.xpath("//*[@id='downloadBtn']/a"));
-        wait.moveToNewFrame(driver);
-        Thread.sleep(7000);
-        System.out.println("Success");
 
+        for (int k = 1; k < requestData.length; k++) {
+            System.out.println(requestData.length);
+            driver.switchTo().defaultContent();
+
+            driver.switchTo().frame("fraCureMD_Menu");
+            waitAndClick(webDriverWait, driver, By.id("patientBtn"));
+            driver.switchTo().defaultContent();
+            driver.switchTo().frame("fraCureMD_Body");
+            waitAndClick(webDriverWait, driver, By.xpath("//*[@title='Search Patient']"));
+            waitAndSendKeys(webDriverWait, driver, By.xpath("//*[@name='BaseIntelliSenseControl1$txtField']"),
+                    requestData[k][0]);
+            driver.findElement(By.xpath("//*[@name='BaseIntelliSenseControl1$txtField']")).sendKeys(Keys.ENTER);
+            Thread.sleep(1000);
+            waitAndClick(webDriverWait, driver, By.xpath("//*[contains(@id,'anchorPatientName')]"));
+            driver.switchTo().defaultContent();
+            driver.switchTo().frame("fraCureMD_Patient_Menu");
+            waitAndClick(webDriverWait, driver, By.id("webfx-tree-object-43-anchor"));
+            driver.switchTo().defaultContent();
+            driver.switchTo().frame("fraCureMD_Body");
+            driver.switchTo().frame("CustomFolders");
+            waitAndClick(webDriverWait, driver, By.xpath("//*[contains(text(),'1Old Records')]"));
+
+            driver.switchTo().defaultContent();
+            driver.switchTo().frame("fraCureMD_Body");
+            driver.switchTo().frame("Thumbs");
+            waitAndClick(webDriverWait, driver, By.xpath("//*[text()='All Documents']"));
+            Thread.sleep(1000);
+            if (!driver.findElement(By.className("no_record_p")).isDisplayed()) {
+                waitAndClick(webDriverWait, driver, By.xpath("//*[@id='chkAll']"));
+                waitAndClick(webDriverWait, driver, By.xpath("//*[@id='downloadBtn']/a"));
+                Thread.sleep(7000);
+                System.out.println("Success");
+            }
+        }
     }
 
     @AfterTest
