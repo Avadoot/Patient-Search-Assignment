@@ -1,8 +1,6 @@
 package com.tests;
 
-import com.tests.utils.BaseExcel;
 import com.tests.utils.Helper;
-import com.tests.utils.Wait;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -22,10 +20,7 @@ public class ExampleTest {
     public static String downloadFolderPath = System.getProperty("user.dir") + "\\testDataOutput";
     public static int waitTime = 45;
     public static WebDriverWait webDriverWait;
-    static Wait wait = new Wait();
     public String filepath = "TestDataTemplate.xlsx";
-    public BaseExcel excel = new BaseExcel();
-    public String[][] requestData;
     public static Helper helper = new Helper();
 
     @BeforeTest
