@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class ExampleTest {
     public static WebDriver driver;
     public static ChromeOptions chromeOptions = new ChromeOptions();
-    public static String downloadFolderPath = System.getProperty("user.dir") + "\\testDataOutput";
+    public static String downloadFolderPath = System.getProperty("user.dir") + "/testDataOutput";
     public static int waitTime = 45;
     public static WebDriverWait webDriverWait;
     public String filepath = "TestDataTemplate.xlsx";

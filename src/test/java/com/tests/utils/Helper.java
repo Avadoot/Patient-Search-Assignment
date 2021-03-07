@@ -5,6 +5,12 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+import static com.tests.ExampleTest.downloadFolderPath;
 import static com.tests.utils.Wait.waitAndClick;
 import static com.tests.utils.Wait.waitAndSendKeys;
 
@@ -13,6 +19,7 @@ public class Helper {
     public Wait wait = new Wait();
     public BaseExcel excel = new BaseExcel();
     public String[][] requestData;
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy_hh-mm-ss");
 
     public void getLoginToTheSystem(WebDriverWait webDriverWait, WebDriver driver) throws Exception {
         waitAndSendKeys(webDriverWait, driver, By.id("vchLogin_Name"), "Absharma");
@@ -72,7 +79,7 @@ public class Helper {
         }
     }
 
-    public void readPatientNameFromExcelDownloadDocs(WebDriverWait webDriverWait, WebDriver driver, String filepath) throws InterruptedException {
+    public void readPatientNameFromExcelDownloadDocs(WebDriverWait webDriverWait, WebDriver driver, String filepath) throws InterruptedException, IOException {
 
         requestData = BaseExcel.readExcel(filepath, 0);
 
@@ -105,10 +112,21 @@ public class Helper {
             if (!driver.findElement(By.className("no_record_p")).isDisplayed()) {
                 waitAndClick(webDriverWait, driver, By.xpath("//*[@id='chkAll']"));
                 waitAndClick(webDriverWait, driver, By.xpath("//*[@id='downloadBtn']/a"));
+                downloadFiles(requestData[k][0], requestData[k][1]);
                 Thread.sleep(7000);
                 System.out.println("Record found for " + requestData[k][0] + " and downloaded successfully");
             } else
                 System.out.println("No document found for " + requestData[k][0]);
         }
+    }
+
+    public static String getCurrentTime() {
+        return simpleDateFormat.format(Calendar.getInstance().getTimeInMillis());
+    }
+
+    public static void downloadFiles(String patientName, String patientBirthDate) throws IOException {
+        File downloadPath = new File(downloadFolderPath + "/" + Helper.getCurrentTime());
+        downloadPath.mkdir();
+        new File(downloadPath + "/" + patientName + "-" + patientBirthDate.replace("/", "-")).mkdirs();
     }
 }
