@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class ExampleTest {
     public static WebDriver driver;
     public static ChromeOptions chromeOptions = new ChromeOptions();
-    public static String downloadFolderPath = System.getProperty("user.dir") + "/testDataOutput";
+    public static String downloadFolderPath = System.getProperty("user.dir") + "\\testDataOutput\\";
     public static int waitTime = 45;
     public static WebDriverWait webDriverWait;
     public String filepath = "TestDataTemplate.xlsx";
@@ -31,7 +31,7 @@ public class ExampleTest {
 
         HashMap<String, Object> chromeLocalStatePref = new HashMap<>();
         chromeLocalStatePref.put("download.default_directory", downloadFolderPath);
-        chromeLocalStatePref.put("download.prompt_for_download", false);
+        chromeLocalStatePref.put("download.prompt_for_download", true);
 
         chromeOptions.setExperimentalOption("localState", chromeLocalStatePref);
         chromeOptions.setExperimentalOption("prefs", chromeLocalStatePref);
