@@ -12,7 +12,7 @@ import java.util.Iterator;
 public class BaseExcel {
     public static String[][] readExcel(String filepath, int no) {
 
-        String[][] excel = new String[16][5];
+        String[][] excel = new String[3001][5];
         try {
 
             FileInputStream excelFile = new FileInputStream(new File(filepath));

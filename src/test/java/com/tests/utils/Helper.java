@@ -1,5 +1,6 @@
 package com.tests.utils;
 
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -45,7 +46,7 @@ public class Helper {
         waitAndClick(webDriverWait, driver, By.xpath("//*[contains(@onclick,'validateSearchClicked')]"));
     }
 
-    public void savePatientDataToExcel(WebDriverWait webDriverWait, WebDriver driver, String filepath) throws InterruptedException {
+    public void savePatientDataToExcel(WebDriverWait webDriverWait, WebDriver driver, String filepath) throws Exception {
         int i = 1;
 
         for (int j = 0; j < 1; j++) {
@@ -68,15 +69,22 @@ public class Helper {
                 System.out.println(names);
                 driver.switchTo().frame("fraCureMD_Patient_Menu");
                 driver.switchTo().frame("iFrameList");
-                excel.writeExcel(filepath, 0, 0, i, element.getText());
-                excel.writeExcel(filepath, 0, 1, i, namesList[2].split(":")[1]);
-                excel.writeExcel(filepath, 0, 2, i, namesList[0]);
-                excel.writeExcel(filepath, 0, 3, i, namesList[1]);
+                try {
+                    excel.writeExcel(filepath, 0, 0, i, element.getText());
+                    excel.writeExcel(filepath, 0, 1, i, namesList[2].split(":")[1]);
+                    excel.writeExcel(filepath, 0, 2, i, namesList[0]);
+                    excel.writeExcel(filepath, 0, 3, i, namesList[1]);
+                } catch (StaleElementReferenceException e) {
+                    excel.writeExcel(filepath, 0, 0, i, element.getText());
+                    excel.writeExcel(filepath, 0, 1, i, namesList[2].split(":")[1]);
+                    excel.writeExcel(filepath, 0, 2, i, namesList[0]);
+                    excel.writeExcel(filepath, 0, 3, i, namesList[1]);
+                }
                 i++;
 
             }
             webDriverWait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.cssSelector(".paginate_button.next"))));
-            waitAndClick(webDriverWait, driver, By.cssSelector(".paginate_button.next"));
+            wait.safeJavaScriptClick(driver.findElement(By.cssSelector(".paginate_button.next")), driver);
             j++;
         }
     }
@@ -132,26 +140,23 @@ public class Helper {
 
     public static void downloadFiles(String pathName, String patientName, String patientBirthDate) throws IOException, InterruptedException {
         File newFile = new File(pathName + "\\" + patientName + "-" + patientBirthDate.replace("/", "-") + "\\");
-        newFile.mkdirs();
+        if (newFile.exists())
+            org.apache.commons.io.FileUtils.deleteQuietly(newFile);
         Thread.sleep(2000);
         FileUtils.moveFileToDirectory(getLastModified(downloadFolderPath),
-                new File(String.valueOf(newFile)),false);
+                new File(String.valueOf(newFile)),true);
 
     }
 
-    public static File getLastModified(String directoryFilePath)
-    {
+    public static File getLastModified(String directoryFilePath) {
         File directory = new File(directoryFilePath);
         File[] files = directory.listFiles(File::isFile);
         long lastModifiedTime = Long.MIN_VALUE;
         File chosenFile = null;
 
-        if (files != null)
-        {
-            for (File file : files)
-            {
-                if (file.lastModified() > lastModifiedTime)
-                {
+        if (files != null) {
+            for (File file : files) {
+                if (file.lastModified() > lastModifiedTime) {
                     chosenFile = file;
                     lastModifiedTime = file.lastModified();
                 }

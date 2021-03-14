@@ -25,7 +25,7 @@ public class ExampleTest {
 
     @BeforeTest
     public void BeforeTest() {
-        WebDriverManager.chromedriver().version("87").setup();
+        WebDriverManager.chromedriver().version("89").setup();
 
         System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
 
